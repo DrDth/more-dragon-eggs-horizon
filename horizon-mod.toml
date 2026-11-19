@@ -1,0 +1,8 @@
+id = "moredragoneggs"
+name = "More Dragon Eggs"
+version = "5.0-horizon.1"
+description = "A dragon egg spawns every time the Ender Dragon dies, not only the first time."
+authors = ["Darkere (original mod)", "DrDth (Horizon port)"]
+api = "0.2"
+side = "server"
+capabilities = ["registries"]
