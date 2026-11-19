@@ -81,18 +81,19 @@ fn spawn_head(config: &str) -> bool {
     })
 }
 
-fn block_is(host: &mut dyn ServerHost, level: LevelRef, pos: [i32; 3], id: &str) -> bool {
-    level
-        .block_state(host, pos)
-        .and_then(|state| host.state_block(state))
-        .is_some_and(|block| block == id)
-}
-
 /// `MoreDragonEggs.PlaceDragonHead`: down from the egg's spot to the pillar's bedrock, then a
 /// dragon head on the first side, turning clockwise from the one facing the nearest player,
 /// whose block (past a bedrock rim) is air.
 fn place_dragon_head(host: &mut dyn ServerHost, level: LevelRef, mut pos: [i32; 3]) {
-    while !block_is(host, level, pos, "minecraft:bedrock") && pos[1] > 0 {
+    // Bedrock and air have one state each: the block test is the state's.
+    let (Some(bedrock), Some(air)) = (
+        host.block_state_id("minecraft:bedrock"),
+        host.block_state_id("minecraft:air"),
+    ) else {
+        return;
+    };
+    let is = |host: &mut dyn ServerHost, pos, state| level.block_state(host, pos) == Some(state);
+    while !is(host, pos, bedrock) && pos[1] > 0 {
         pos[1] -= 1;
     }
     // `Level.getNearestPlayer(x, y, z, -1, null)`: any distance, the first of the nearest.
@@ -111,10 +112,10 @@ fn place_dragon_head(host: &mut dyn ServerHost, level: LevelRef, mut pos: [i32; 
     for _ in 0..4 {
         let mut head = side.step(pos);
         // Room for end podiums with a rim, as BetterEnd Reforked builds them.
-        if block_is(host, level, head, "minecraft:bedrock") {
+        if is(host, head, bedrock) {
             head = side.step(head);
         }
-        if block_is(host, level, head, "minecraft:air") {
+        if is(host, head, air) {
             let name = format!("minecraft:dragon_wall_head[facing={}]", side.name());
             if let Some(state) = host.block_state_id(&name) {
                 // `setBlockAndUpdate`.
