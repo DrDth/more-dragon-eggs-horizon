@@ -3,14 +3,14 @@
 //!
 //! A port of Darkere's More Dragon Eggs (MIT), from its 1.21 sources (5.0). The original injects
 //! at the head of `EnderDragonFight.setDragonKilled`. The port answers Horizon's
-//! `dragon_egg_form`, which on a later win arrives cancelled (vanilla places the first egg
-//! only), and clears the cancel, so the game places the egg where it places the first.
+//! `dragon_fight_won`, asked on every win: once the fight was won before it places an egg, where
+//! the game places the first one (vanilla's, on the first win).
 use std::sync::Mutex;
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use mod_api::{
-    BlockUpdateFlags, ConfigPath, DragonEggFormEvent, Flow, Hooks, LevelHost, LevelRef,
-    ServerHost, ServerStartedEvent, ServerTickEvent, ServerTickPhase,
+    BlockUpdateFlags, ConfigPath, DragonFightWonEvent, Hooks, LevelHost, LevelRef, ServerHost,
+    ServerStartedEvent, ServerTickEvent, ServerTickPhase,
 };
 
 /// The original's config, `ServerConfig`, kept in the game's `config/` folder.
@@ -146,16 +146,15 @@ impl Hooks for MoreDragonEggs {
         self.spawn_head.store(spawn_head(&text), Ordering::Relaxed);
     }
 
-    // First of all mods, as the original's injection runs before the fight places anything:
-    // the cancel it finds is the game's.
-    #[listener(priority = 1000, receive_cancelled)]
-    fn dragon_egg_form(&self, _: &dyn LevelHost, event: &mut DragonEggFormEvent) -> Flow {
-        event.cancelled = false;
+    // First of all mods, as the original's injection runs before the fight places anything.
+    #[listener(priority = 1000)]
+    fn dragon_fight_won(&self, _: &dyn LevelHost, event: &mut DragonFightWonEvent) -> Option<bool> {
         if self.spawn_head.load(Ordering::Relaxed) {
             let pos = [event.pos.x, event.pos.y, event.pos.z];
             *self.head.lock().unwrap() = Some((event.dimension.key().id().to_owned(), pos));
         }
-        Flow::Continue
+        // The first win's egg is vanilla's; the original places one on every later win.
+        event.won_before.then_some(true)
     }
 
     fn server_tick(&self, host: &mut dyn ServerHost, event: &mut ServerTickEvent<'_>) {

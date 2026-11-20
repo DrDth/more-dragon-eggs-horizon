@@ -19,8 +19,8 @@ The mod is server side only: a server or a single-player world needs it, joining
 
 ## Building
 
-The mod needs `dragon_egg_form` to fire on every won fight, added to Horizon in
-[horizon-rust/horizon#18520](https://github.com/horizon-rust/horizon/issues/18520). Until a Horizon release has
+The mod needs the `dragon_fight_won` hook, asked on every won fight, added to Horizon in
+[horizon-rust/horizon#18539](https://github.com/horizon-rust/horizon/pull/18539). Until a Horizon release has
 it, build the mod inside a Horizon checkout that does:
 
 ```sh
