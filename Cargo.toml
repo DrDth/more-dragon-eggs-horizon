@@ -6,9 +6,9 @@ publish = false
 license = "MIT"
 
 [dependencies]
-# While the `dragon_fight_won` hook (horizon-rust/horizon#18539) is unreleased, the mod builds
-# inside a Horizon checkout that has it, from `.local/dev-mods/more_dragon_eggs` (see README.md);
-# once a Nightly has it, this becomes the pinned SDK path `cargo horizon-mod` writes.
+# Until a Nightly has the `dragon_fight_won` hook (horizon-rust/horizon#18539, merged), the mod
+# builds inside a Horizon checkout, from `.local/dev-mods/more_dragon_eggs` (see README.md); then
+# this becomes the pinned SDK path `cargo horizon-mod` writes.
 horizon-mod-api = { path = "../../../crates/horizon-mod-api" }
 
 # A mod is its own project, not a member of the game's workspace.

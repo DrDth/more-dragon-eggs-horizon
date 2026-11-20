@@ -20,8 +20,8 @@ The mod is server side only: a server or a single-player world needs it, joining
 ## Building
 
 The mod needs the `dragon_fight_won` hook, asked on every won fight, added to Horizon in
-[horizon-rust/horizon#18539](https://github.com/horizon-rust/horizon/pull/18539). Until a Horizon release has
-it, build the mod inside a Horizon checkout that does:
+[horizon-rust/horizon#18539](https://github.com/horizon-rust/horizon/pull/18539), merged. Until a Horizon release
+has it, build the mod inside a checkout of Horizon's `main`:
 
 ```sh
 mkdir -p <horizon>/.local/dev-mods/more_dragon_eggs
